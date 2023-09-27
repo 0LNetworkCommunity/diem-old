@@ -5263,6 +5263,7 @@ dependencies = [
  "diem-bitvec",
  "diem-crypto",
  "diem-crypto-derive",
+ "diem-enum-conversion-derive",
  "hex",
  "itertools",
  "move-core-types",

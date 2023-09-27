@@ -63,3 +63,16 @@ pub fn derive_enum_converters(input: TokenStream) -> TokenStream {
         .to_compile_error()
         .into()
 }
+
+
+#[proc_macro]
+pub fn name_coin(_item: TokenStream) -> TokenStream {
+    let module_name = option_env!("RUST_DIEM_COIN_MODULE").unwrap_or("diem_coin").to_owned();
+    let coin_name = option_env!("RUST_DIEM_COIN_NAME").unwrap_or("DiemCoin").to_owned();
+    // returns model
+
+    let s = format!("
+      static COIN_MODULE: &'static str = \"{}\"; \n static COIN_NAME: &'static str = \"{}\";", module_name, coin_name);
+
+    s.parse().unwrap()
+}
