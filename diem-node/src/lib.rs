@@ -458,8 +458,8 @@ fn create_single_node_test_config(
 /// Initializes the node environment and starts the node
 pub fn setup_environment_and_start_node(
     mut node_config: NodeConfig,
-    remote_log_rx: Option<mpsc::Receiver<TelemetryLog>>,
-    logger_filter_update_job: Option<LoggerFilterUpdater>,
+    _remote_log_rx: Option<mpsc::Receiver<TelemetryLog>>,
+    _logger_filter_update_job: Option<LoggerFilterUpdater>,
 ) -> anyhow::Result<DiemHandle> {
     // Log the node config at node startup
     info!("Using node config {:?}", &node_config);
@@ -481,13 +481,13 @@ pub fn setup_environment_and_start_node(
     // Set the chain_id in global DiemNodeIdentity
     diem_node_identity::set_chain_id(chain_id)?;
 
-    // Start the telemetry service (as early as possible and before any blocking calls)
-    let telemetry_runtime = services::start_telemetry_service(
-        &node_config,
-        remote_log_rx,
-        logger_filter_update_job,
-        chain_id,
-    );
+    // // Start the telemetry service (as early as possible and before any blocking calls)
+    // let telemetry_runtime = services::start_telemetry_service(
+    //     &node_config,
+    //     remote_log_rx,
+    //     logger_filter_update_job,
+    //     chain_id,
+    // );
 
     // Create an event subscription service (and reconfig subscriptions for consensus and mempool)
     let (
@@ -571,7 +571,7 @@ pub fn setup_environment_and_start_node(
         _network_runtimes: network_runtimes,
         _peer_monitoring_service_runtime: peer_monitoring_service_runtime,
         _state_sync_runtimes: state_sync_runtimes,
-        _telemetry_runtime: telemetry_runtime,
+        _telemetry_runtime: None,
     })
 }
 

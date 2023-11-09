@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::server::utils::{CONTENT_TYPE_JSON, CONTENT_TYPE_TEXT};
-use diem_build_info::build_information;
+// use diem_build_info::build_information;
 use diem_config::config::NodeConfig;
 use hyper::{Body, StatusCode};
 
@@ -30,13 +30,14 @@ pub fn handle_system_information_request(node_config: NodeConfig) -> (StatusCode
 
 /// Returns a simple JSON formatted string with system information
 fn get_system_information_json() -> String {
-    // Get the system and build information
-    let mut system_information = diem_telemetry::system_information::get_system_information();
-    system_information.extend(build_information!());
+   return "".to_string();
+    // // Get the system and build information
+    // let mut system_information = diem_telemetry::system_information::get_system_information();
+    // system_information.extend(build_information!());
 
-    // Return the system information as a JSON string
-    match serde_json::to_string(&system_information) {
-        Ok(system_information) => system_information,
-        Err(error) => format!("Failed to get system information! Error: {}", error),
-    }
+    // // Return the system information as a JSON string
+    // match serde_json::to_string(&system_information) {
+    //     Ok(system_information) => system_information,
+    //     Err(error) => format!("Failed to get system information! Error: {}", error),
+    // }
 }

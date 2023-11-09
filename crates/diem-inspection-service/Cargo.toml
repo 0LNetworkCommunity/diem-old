@@ -21,7 +21,7 @@ diem-logger = { workspace = true }
 diem-metrics-core = { workspace = true }
 diem-network = { workspace = true }
 diem-runtimes = { workspace = true }
-diem-telemetry = { workspace = true }
+# diem-telemetry = { workspace = true }
 futures = { workspace = true }
 hyper = { workspace = true }
 once_cell = { workspace = true }

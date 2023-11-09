@@ -1371,7 +1371,7 @@ dependencies = [
  "dotenv",
  "futures-util",
  "hex",
- "jsonwebtoken 7.2.0",
+ "jsonwebtoken",
  "lazy_static 1.4.0",
  "openssl",
  "percent-encoding",
@@ -1986,15 +1986,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "debug-ignore"
-version = "1.0.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4b48b0b49e2f473c499ddcd133e78f0f2629aaa997ee61adadb2d1753e6af4cf"
-dependencies = [
- "serde 1.0.149",
-]
-
-[[package]]
 name = "derivation-path"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2077,7 +2068,6 @@ dependencies = [
  "diem-rest-client",
  "diem-sdk",
  "diem-storage-interface",
- "diem-telemetry",
  "diem-temppath",
  "diem-transactional-test-harness",
  "diem-types",
@@ -3817,7 +3807,6 @@ dependencies = [
  "diem-metrics-core",
  "diem-network",
  "diem-runtimes",
- "diem-telemetry",
  "futures",
  "hyper",
  "once_cell",
@@ -4274,7 +4263,6 @@ dependencies = [
  "diem-storage-service-client",
  "diem-storage-service-server",
  "diem-storage-service-types",
- "diem-telemetry",
  "diem-temppath",
  "diem-time-service",
  "diem-types",
@@ -4981,90 +4969,6 @@ dependencies = [
  "proptest",
  "serde 1.0.149",
  "thiserror",
-]
-
-[[package]]
-name = "diem-telemetry"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "diem-api",
- "diem-config",
- "diem-consensus",
- "diem-crypto",
- "diem-db",
- "diem-infallible",
- "diem-logger",
- "diem-mempool",
- "diem-metrics-core",
- "diem-network",
- "diem-node-resource-metrics",
- "diem-runtimes",
- "diem-state-sync-driver",
- "diem-telemetry-service",
- "diem-types",
- "flate2",
- "futures",
- "httpmock",
- "once_cell",
- "prometheus",
- "rand 0.7.3",
- "rand_core 0.5.1",
- "reqwest",
- "reqwest-middleware",
- "reqwest-retry",
- "serde 1.0.149",
- "serde_json",
- "sysinfo",
- "thiserror",
- "tokio",
- "tokio-retry",
- "tokio-stream",
- "url",
- "uuid",
-]
-
-[[package]]
-name = "diem-telemetry-service"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "base64 0.13.0",
- "bcs 0.1.4",
- "chrono",
- "clap 4.3.5",
- "debug-ignore",
- "diem-config",
- "diem-crypto",
- "diem-crypto-derive",
- "diem-infallible",
- "diem-logger",
- "diem-metrics-core",
- "diem-rest-client",
- "diem-types",
- "flate2",
- "futures",
- "gcp-bigquery-client",
- "hex",
- "httpmock",
- "jsonwebtoken 8.1.1",
- "once_cell",
- "prometheus",
- "rand 0.7.3",
- "rand_core 0.5.1",
- "reqwest",
- "reqwest-middleware",
- "reqwest-retry",
- "serde 1.0.149",
- "serde_json",
- "serde_repr",
- "serde_yaml 0.8.26",
- "thiserror",
- "tokio",
- "tracing",
- "url",
- "uuid",
- "warp",
 ]
 
 [[package]]
@@ -7357,21 +7261,7 @@ dependencies = [
  "ring",
  "serde 1.0.149",
  "serde_json",
- "simple_asn1 0.4.1",
-]
-
-[[package]]
-name = "jsonwebtoken"
-version = "8.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1aa4b4af834c6cfd35d8763d359661b90f2e45d8f750a0849156c7f4671af09c"
-dependencies = [
- "base64 0.13.0",
- "pem 1.1.0",
- "ring",
- "serde 1.0.149",
- "serde_json",
- "simple_asn1 0.6.2",
+ "simple_asn1",
 ]
 
 [[package]]
@@ -11502,18 +11392,6 @@ dependencies = [
  "chrono",
  "num-bigint 0.2.6",
  "num-traits 0.2.15",
-]
-
-[[package]]
-name = "simple_asn1"
-version = "0.6.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "adc4e5204eb1910f40f9cfa375f6f05b68c3abac4b6fd879c8ff5e7ae8a0a085"
-dependencies = [
- "num-bigint 0.4.3",
- "num-traits 0.2.15",
- "thiserror",
- "time 0.3.13",
 ]
 
 [[package]]

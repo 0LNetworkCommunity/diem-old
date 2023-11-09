@@ -2,13 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{bootstrap_api, indexer, mpsc::Receiver, network::ApplicationNetworkInterfaces};
-use diem_build_info::build_information;
+// use diem_build_info::build_information;
 use diem_config::config::NodeConfig;
 use diem_consensus::network_interface::ConsensusMsg;
 use diem_consensus_notifications::ConsensusNotifier;
 use diem_event_notifications::ReconfigNotificationListener;
 use diem_indexer_grpc_fullnode::runtime::bootstrap as bootstrap_indexer_grpc;
-use diem_logger::{debug, telemetry_log_writer::TelemetryLog, LoggerFilterUpdater};
+// use diem_logger::{debug, telemetry_log_writer::TelemetryLog,
+// LoggerFilterUpdater};
+use diem_logger::debug;
 use diem_mempool::{network::MempoolSyncMsg, MempoolClientRequest, QuorumStoreRequest};
 use diem_mempool_notifications::MempoolNotificationListener;
 use diem_network::application::{interface::NetworkClientInterface, storage::PeersAndMetadata};
@@ -184,19 +186,25 @@ pub fn start_peer_monitoring_service(
     peer_monitoring_service_runtime
 }
 
-/// Starts the telemetry service and grabs the build information
-pub fn start_telemetry_service(
-    node_config: &NodeConfig,
-    remote_log_rx: Option<Receiver<TelemetryLog>>,
-    logger_filter_update_job: Option<LoggerFilterUpdater>,
-    chain_id: ChainId,
-) -> Option<Runtime> {
-    let build_info = build_information!();
-    diem_telemetry::service::start_telemetry_service(
-        node_config.clone(),
-        chain_id,
-        build_info,
-        remote_log_rx,
-        logger_filter_update_job,
-    )
-}
+//////// 0L ////////
+//      silly rabbit
+
+// /// Starts the telemetry service and grabs the build information
+// pub fn start_telemetry_service(
+//     node_config: &NodeConfig,
+//     remote_log_rx: Option<Receiver<TelemetryLog>>,
+//     logger_filter_update_job: Option<LoggerFilterUpdater>,
+//     chain_id: ChainId,
+// ) -> Option<Runtime> {
+//     return None;
+
+//     let build_info = build_information!();
+//     diem_telemetry::service::start_telemetry_service(
+//         node_config.clone(),
+//         chain_id,
+//         build_info,
+//         remote_log_rx,
+//         logger_filter_update_job,
+//     )
+// }
+//////// 0L ////////

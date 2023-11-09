@@ -38,7 +38,7 @@ diem-node = { workspace = true }
 diem-rest-client = { workspace = true }
 diem-sdk = { workspace = true }
 diem-storage-interface = { workspace = true }
-diem-telemetry = { workspace = true }
+# diem-telemetry = { workspace = true }
 diem-temppath = { workspace = true }
 diem-transactional-test-harness = { workspace = true }
 diem-types = { workspace = true }

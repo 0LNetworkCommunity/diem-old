@@ -14,7 +14,7 @@ use diem_crypto::ed25519::{Ed25519PrivateKey, Ed25519PublicKey};
 use diem_keygen::KeyGen;
 use diem_logger::{debug, Level};
 use diem_rest_client::{diem_api_types::HashValue, Account, Client, State};
-use diem_telemetry::service::telemetry_is_disabled;
+// use diem_telemetry::service::telemetry_is_disabled;
 use diem_types::{
     account_address::create_multisig_account_address,
     chain_id::ChainId,
@@ -35,7 +35,7 @@ use std::{
     str::FromStr,
     time::{Duration, Instant, SystemTime},
 };
-use tokio::time::timeout;
+// use tokio::time::timeout;
 
 /// Prompts for confirmation until a yes or no is given explicitly
 pub fn prompt_yes(prompt: &str) -> bool {
@@ -68,30 +68,30 @@ pub async fn to_common_success_result<T>(
 
 /// For pretty printing outputs in JSON
 pub async fn to_common_result<T: Serialize>(
-    command: &str,
-    start_time: Instant,
+    _command: &str,
+    _start_time: Instant,
     result: CliTypedResult<T>,
 ) -> CliResult {
-    let latency = start_time.elapsed();
+    // let latency = start_time.elapsed();
     let is_err = result.is_err();
 
-    if !telemetry_is_disabled() {
-        let error = if let Err(ref error) = result {
-            // Only print the error type
-            Some(error.to_str())
-        } else {
-            None
-        };
+    // if !telemetry_is_disabled() {
+    //     let error = if let Err(ref error) = result {
+    //         // Only print the error type
+    //         Some(error.to_str())
+    //     } else {
+    //         None
+    //     };
 
-        if let Err(err) = timeout(
-            Duration::from_millis(2000),
-            send_telemetry_event(command, latency, !is_err, error),
-        )
-        .await
-        {
-            debug!("send_telemetry_event timeout from CLI: {}", err.to_string())
-        }
-    }
+    //     // if let Err(err) = timeout(
+    //     //     Duration::from_millis(2000),
+    //     //     send_telemetry_event(command, latency, !is_err, error),
+    //     // )
+    //     // .await
+    //     // {
+    //     //     debug!("send_telemetry_event timeout from CLI: {}", err.to_string())
+    //     // }
+    // }
 
     let result: ResultWrapper<T> = result.into();
     let string = serde_json::to_string_pretty(&result).unwrap();
@@ -106,26 +106,28 @@ pub fn cli_build_information() -> BTreeMap<String, String> {
     build_information!()
 }
 
-/// Sends a telemetry event about the CLI build, command and result
-async fn send_telemetry_event(
-    command: &str,
-    latency: Duration,
-    success: bool,
-    error: Option<&str>,
-) {
-    // Collect the build information
-    let build_information = cli_build_information();
+// /// Sends a telemetry event about the CLI build, command and result
+// async fn send_telemetry_event(
+//     command: &str,
+//     latency: Duration,
+//     success: bool,
+//     error: Option<&str>,
+// ) {
+//     //////// 0L disable ////////
+//     return;
+//     // Collect the build information
+//     let build_information = cli_build_information();
 
-    // Send the event
-    diem_telemetry::cli_metrics::send_cli_telemetry_event(
-        build_information,
-        command.into(),
-        latency,
-        success,
-        error,
-    )
-    .await;
-}
+//     // // Send the event
+//     // diem_telemetry::cli_metrics::send_cli_telemetry_event(
+//     //     build_information,
+//     //     command.into(),
+//     //     latency,
+//     //     success,
+//     //     error,
+//     // )
+//     // .await;
+// }
 
 /// A result wrapper for displaying either a correct execution result or an error.
 ///
@@ -489,7 +491,6 @@ pub fn parse_json_file<T: for<'a> Deserialize<'a>>(path_ref: &Path) -> CliTypedR
         CliError::UnableToReadFile(format!("{}", path_ref.display()), err.to_string())
     })
 }
-
 /// Convert a view function JSON field into a string option.
 ///
 /// A view function JSON return represents an option via an inner JSON array titled `vec`.

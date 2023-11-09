@@ -72,8 +72,8 @@ members = [
     "crates/diem-rosetta-cli",
     "crates/diem-runtimes",
     "crates/diem-speculative-state-helper",
-    "crates/diem-telemetry",
-    "crates/diem-telemetry-service",
+    # "crates/diem-telemetry",
+    # "crates/diem-telemetry-service",
     "crates/diem-temppath",
     "crates/diem-time-service",
     "crates/diem-warp-webserver",
@@ -366,8 +366,8 @@ diem-storage-interface = { path = "storage/storage-interface" }
 diem-storage-service-client = { path = "state-sync/storage-service/client" }
 diem-storage-service-types = { path = "state-sync/storage-service/types" }
 diem-storage-service-server = { path = "state-sync/storage-service/server" }
-diem-telemetry = { path = "crates/diem-telemetry" }
-diem-telemetry-service = { path = "crates/diem-telemetry-service" }
+# diem-telemetry = { path = "crates/diem-telemetry" }
+# diem-telemetry-service = { path = "crates/diem-telemetry-service" }
 diem-temppath = { path = "crates/diem-temppath" }
 diem-testcases = { path = "testsuite/testcases" }
 diem-time-service = { path = "crates/diem-time-service", features = [

@@ -53,7 +53,7 @@ diem-storage-interface = { workspace = true }
 diem-storage-service-client = { workspace = true }
 diem-storage-service-server = { workspace = true }
 diem-storage-service-types = { workspace = true }
-diem-telemetry = { workspace = true }
+# diem-telemetry = { workspace = true }
 diem-temppath = { workspace = true }
 diem-time-service = { workspace = true }
 diem-types = { workspace = true }
