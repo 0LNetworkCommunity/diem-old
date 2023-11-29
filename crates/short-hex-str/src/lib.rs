@@ -47,11 +47,12 @@ impl ShortHexStr {
         // We could also do str::from_utf8_unchecked here to avoid the unnecessary
         // runtime check. Shaves ~6-7 ns/iter in a micro bench but the unsafe is
         // probably not worth the hassle.
-        str::from_utf8(&self.0).expect(
+        let s = str::from_utf8(&self.0).expect(
             "This can never fail since &self.0 will only ever contain the \
              following characters: '0123456789abcdef', which are all valid \
              ASCII characters and therefore all valid UTF-8",
-        )
+        ).trim_start_matches("0"); //////// 0L //////// many addresses are padded after v5 conversion
+        s
     }
 }
 
