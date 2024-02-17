@@ -6,10 +6,10 @@ use crate::{
     adapter_common::{
         discard_error_output, discard_error_vm_status, PreprocessedTransaction, VMAdapter,
     },
-    diem_vm_impl::{get_transaction_output, DiemVMImpl, DiemVMInternals},
-    block_executor::{DiemTransactionOutput, BlockDiemVM},
+    block_executor::{BlockDiemVM, DiemTransactionOutput},
     counters::*,
     data_cache::StorageAdapter,
+    diem_vm_impl::{get_transaction_output, DiemVMImpl, DiemVMInternals},
     errors::expect_only_successful_execution,
     move_vm_ext::{MoveResolverExt, RespawnedSession, SessionExt, SessionId},
     sharded_block_executor::ShardedBlockExecutor,
@@ -23,8 +23,7 @@ use diem_block_executor::txn_commit_hook::NoOpTransactionCommitHook;
 use diem_crypto::HashValue;
 use diem_framework::natives::code::PublishRequest;
 use diem_gas::{
-    DiemGasMeter, DiemGasParameters, ChangeSetConfigs, Gas, StandardGasMeter,
-    StorageGasParameters,
+    ChangeSetConfigs, DiemGasMeter, DiemGasParameters, Gas, StandardGasMeter, StorageGasParameters,
 };
 use diem_logger::{enabled, prelude::*, Level};
 use diem_state_view::StateView;
@@ -416,10 +415,13 @@ impl DiemVM {
 
         // Run the execution logic
         {
-            gas_meter.charge_intrinsic_gas_for_transaction(txn_data.transaction_size())?;
+            // commit note: moved to gas fee evaluation to match below
 
             match payload {
                 TransactionPayload::Script(script) => {
+                    // always tx payload first for scripts
+                    gas_meter.charge_intrinsic_gas_for_transaction(txn_data.transaction_size())?;
+
                     let loaded_func =
                         session.load_script(script.code(), script.ty_args().to_vec())?;
                     let args =
@@ -446,6 +448,22 @@ impl DiemVM {
                         txn_data.senders(),
                         script_fn,
                     )?;
+
+                    // special case of epoch boundaries which use a lot of gas
+                    // this function is intentionally able to be called by any
+                    // end user
+                    let is_epoch = script_fn
+                        .module()
+                        .to_string()
+                        .contains("0x1::diem_governance")
+                        && script_fn.function().as_str().contains("trigger_epoch");
+
+                    if !is_epoch {
+                        warn!("Epoch boundary called by user on 0x1::diem_governance::trigger_epoch. Will not evaluate gas!");
+                    } else {
+                        gas_meter
+                            .charge_intrinsic_gas_for_transaction(txn_data.transaction_size())?;
+                    }
                 },
 
                 // Not reachable as this function should only be invoked for entry or script
