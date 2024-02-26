@@ -385,6 +385,7 @@ impl DiemVM {
             &function,
             struct_constructors,
         )?;
+        info!("executing entry function");
         Ok(session.execute_entry_function(
             script_fn.module(),
             script_fn.function(),
@@ -442,28 +443,48 @@ impl DiemVM {
                     )?;
                 },
                 TransactionPayload::EntryFunction(script_fn) => {
-                    self.validate_and_execute_entry_function(
-                        &mut session,
-                        gas_meter,
-                        txn_data.senders(),
-                        script_fn,
-                    )?;
-
+                    warn!("is entry function");
                     // special case of epoch boundaries which use a lot of gas
                     // this function is intentionally able to be called by any
                     // end user
+                    let text = script_fn
+                        .module()
+                        .to_string();
+                    warn!("{}", &text);
+
+                    let text = script_fn.function().as_str();
+                    warn!("{}", &text);
+
                     let is_epoch = script_fn
                         .module()
                         .to_string()
-                        .contains("0x1::diem_governance")
-                        && script_fn.function().as_str().contains("trigger_epoch");
+                        .contains("000000000000000000000000000000000000000000000000000000000000001::diem_governance");
+                        // && script_fn.function().as_str().contains("trigger_epoch");
 
-                    if !is_epoch {
+                    warn!("{:?}", &is_epoch);
+
+                    if is_epoch {
                         warn!("Epoch boundary called by user on 0x1::diem_governance::trigger_epoch. Will not evaluate gas!");
                     } else {
                         gas_meter
                             .charge_intrinsic_gas_for_transaction(txn_data.transaction_size())?;
                     }
+
+                    // gas_meter.
+
+
+                    let res = self.validate_and_execute_entry_function(
+                        &mut session,
+                        gas_meter,
+                        txn_data.senders(),
+                        script_fn,
+                    );
+                    warn!("done");
+
+                    warn!("{:?}", &res);
+                    res?;
+
+
                 },
 
                 // Not reachable as this function should only be invoked for entry or script
