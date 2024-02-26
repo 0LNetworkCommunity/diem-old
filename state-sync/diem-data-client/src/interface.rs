@@ -3,6 +3,7 @@
 
 use crate::{error, error::Error, global_summary::GlobalDataSummary};
 use diem_storage_service_types::{responses::TransactionOrOutputListWithProof, Epoch};
+use diem_config::network_id::PeerNetworkId;
 use diem_types::{
     ledger_info::LedgerInfoWithSignatures,
     state_store::state_value::StateValueChunkWithProof,
@@ -20,6 +21,10 @@ pub trait DiemDataClientInterface {
     /// This API is intended to be relatively cheap to call, usually returning a
     /// cached view of this data client's available data.
     fn get_global_data_summary(&self) -> GlobalDataSummary;
+
+
+    /// Fetches all the current connected peers.
+    fn get_all_connected_peers(&self) -> crate::error::Result<Vec<PeerNetworkId>, Error>;
 
     /// Fetches the epoch ending ledger infos between start and end
     /// (inclusive). In some cases, fewer ledger infos may be returned (e.g.,

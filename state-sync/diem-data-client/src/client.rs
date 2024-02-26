@@ -281,6 +281,9 @@ impl DiemDataClient {
         Ok(connected_peers)
     }
 
+
+
+
     /// Returns all priority and regular peers
     pub(crate) fn get_priority_and_regular_peers(
         &self,
@@ -517,6 +520,10 @@ impl DiemDataClient {
 impl DiemDataClientInterface for DiemDataClient {
     fn get_global_data_summary(&self) -> GlobalDataSummary {
         self.global_summary_cache.read().clone()
+    }
+
+    fn get_all_connected_peers(&self) -> crate::error::Result<Vec<PeerNetworkId>, Error> {
+        self.get_all_connected_peers()
     }
 
     async fn get_epoch_ending_ledger_infos(

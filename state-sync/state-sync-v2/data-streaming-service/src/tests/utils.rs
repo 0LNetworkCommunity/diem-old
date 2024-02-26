@@ -209,7 +209,7 @@ impl DiemDataClientInterface for MockDiemDataClient {
             transaction_chunk_size: create_range_random_u64(20, 1000),
             transaction_output_chunk_size: create_range_random_u64(20, 1000),
         };
-
+       
         // Create a global data summary with a fixed set of data
         let advertised_data = AdvertisedData {
             states: vec![
@@ -237,6 +237,12 @@ impl DiemDataClientInterface for MockDiemDataClient {
             optimal_chunk_sizes,
         }
     }
+
+
+    fn get_all_connected_peers(&self) -> crate::error::Result<Vec<PeerNetworkId>, Error> {
+         crate::error::Error::NotImplemented("Not implemented".to_string())
+    }
+
 
     async fn get_state_values_with_proof(
         &self,

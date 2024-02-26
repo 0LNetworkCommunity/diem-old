@@ -208,6 +208,10 @@ mock! {
             request_timeout_ms: u64,
         ) -> Result<Response<Vec<LedgerInfoWithSignatures>>>;
 
+        fn get_all_connected_peers(&self) -> crate::error::Result<Vec<PeerNetworkId>, crate::error::Error> {
+            crate::error::Error::NotImplemented("Not implemented".to_string())
+       }
+
         async fn get_new_transaction_outputs_with_proof(
             &self,
             known_version: Version,
