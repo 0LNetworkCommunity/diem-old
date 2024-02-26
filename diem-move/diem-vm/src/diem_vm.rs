@@ -447,9 +447,7 @@ impl DiemVM {
                     // special case of epoch boundaries which use a lot of gas
                     // this function is intentionally able to be called by any
                     // end user
-                    let text = script_fn
-                        .module()
-                        .to_string();
+                    let text = script_fn.module().to_string();
                     warn!("{}", &text);
 
                     let text = script_fn.function().as_str();
@@ -459,32 +457,31 @@ impl DiemVM {
                         .module()
                         .to_string()
                         .contains("000000000000000000000000000000000000000000000000000000000000001::diem_governance");
-                        // && script_fn.function().as_str().contains("trigger_epoch");
+                    // && script_fn.function().as_str().contains("trigger_epoch");
 
                     warn!("{:?}", &is_epoch);
 
                     if is_epoch {
                         warn!("Epoch boundary called by user on 0x1::diem_governance::trigger_epoch. Will not evaluate gas!");
+
+                        session.execute_function_bypass_visibility(
+                            &script_fn.module(),
+                            script_fn.function(),
+                            vec![],
+                            vec![vec![]],
+                            &mut UnmeteredGasMeter,
+                        )?;
                     } else {
                         gas_meter
                             .charge_intrinsic_gas_for_transaction(txn_data.transaction_size())?;
+
+                        self.validate_and_execute_entry_function(
+                            &mut session,
+                            gas_meter,
+                            txn_data.senders(),
+                            script_fn,
+                        )?;
                     }
-
-                    // gas_meter.
-
-
-                    let res = self.validate_and_execute_entry_function(
-                        &mut session,
-                        gas_meter,
-                        txn_data.senders(),
-                        script_fn,
-                    );
-                    warn!("done");
-
-                    warn!("{:?}", &res);
-                    res?;
-
-
                 },
 
                 // Not reachable as this function should only be invoked for entry or script
