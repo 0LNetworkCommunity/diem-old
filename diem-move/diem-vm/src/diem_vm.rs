@@ -443,32 +443,52 @@ impl DiemVM {
                     )?;
                 },
                 TransactionPayload::EntryFunction(script_fn) => {
-                    warn!("is entry function");
-                    // special case of epoch boundaries which use a lot of gas
-                    // this function is intentionally able to be called by any
-                    // end user
-                    let text = script_fn.module().to_string();
-                    warn!("{}", &text);
+                    ///////// 0L ////////
+                    // For the special case of epoch boundaries which use a lot
+                    // of gas this function is intentionally able to be called
+                    // by any  end user
+                    // It is done this way in OL so that the VM never
+                    // is the signer of a transaction. FOR NO TRANSACTIONS IN
+                    // 0L.
+                    // The main benefit is that the chain cannot halt on
+                    // administrative processes that are done at the epoch
+                    // boundary.
+                    // In the event of the db being in an unexpected state, a
+                    // user-initiated epoch boundary will abort the transaction
+                    // with error. Were the VM to call this same transaction the
+                    // network would halt.
+                    // (Perhaps with sufficient formal verification the network
+                    // could get to the point of never having an error.)
+                    // However, the epoch boundary may use more
+                    // resources than the allowed limit for user
+                    // transactions.
+                    // So we make a special exception here.
+                    // Otherwise the user sending the epoch trigger
+                    // would see: EXECUTION_LIMIT_REACHED.
 
-                    let text = script_fn.function().as_str();
-                    warn!("{}", &text);
-
-                    let is_epoch = script_fn
+                    // TODO: how much expense does this add?
+                    let is_gov = script_fn
                         .module()
                         .to_string()
                         .contains("000000000000000000000000000000000000000000000000000000000000001::diem_governance");
-                    // && script_fn.function().as_str().contains("trigger_epoch");
+                    let is_trigger = script_fn.function().to_string().contains("trigger_epoch"); // NOTE: will also catch smoke_trigger_epoch. Used in smoke tests
 
-                    warn!("{:?}", &is_epoch);
-
-                    if is_epoch {
+                    if is_gov && is_trigger {
                         warn!("Epoch boundary called by user on 0x1::diem_governance::trigger_epoch. Will not evaluate gas!");
 
+                        let args = txn_data
+                            .senders() // only doing a single arg, the sender
+                            .into_iter()
+                            .map(|s| MoveValue::Signer(s).simple_serialize().unwrap())
+                            .collect();
+
+                        // run the function with the same privilege VM
+                        // would have: no metering of gas
                         session.execute_function_bypass_visibility(
                             &script_fn.module(),
                             script_fn.function(),
                             vec![],
-                            vec![vec![]],
+                            args,
                             &mut UnmeteredGasMeter,
                         )?;
                     } else {
