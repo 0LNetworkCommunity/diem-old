@@ -20,7 +20,8 @@ use crate::{
     utils,
     utils::{OutputFallbackHandler, PENDING_DATA_LOG_FREQ_SECS},
 };
-use diem_config::config::{RoleType, StateSyncDriverConfig};
+use diem_config::{config::{RoleType, StateSyncDriverConfig}, network_id::NetworkId};
+
 use diem_consensus_notifications::{
     ConsensusCommitNotification, ConsensusNotification, ConsensusSyncNotification,
 };
@@ -28,6 +29,9 @@ use diem_data_client::interface::DiemDataClientInterface;
 use diem_data_streaming_service::streaming_client::{
     DataStreamingClient, NotificationAndFeedback, NotificationFeedback,
 };
+
+
+
 use diem_event_notifications::EventSubscriptionService;
 use diem_infallible::Mutex;
 use diem_logger::prelude::*;
@@ -42,6 +46,7 @@ use tokio::{
     time::{interval, Duration},
 };
 use tokio_stream::wrappers::IntervalStream;
+
 
 // Useful constants for the driver
 const DRIVER_ERROR_LOG_FREQ_SECS: u64 = 3;
@@ -508,6 +513,23 @@ impl<
         Ok(())
     }
 
+    /// Returns true iff the validator is in validator set 
+    fn is_in_validator_set(&self) -> bool {
+        let connected_peers = self.diem_data_client.get_all_connected_peers();
+        match connected_peers{
+            Ok(connected_peers) => {
+                // Check if there is a validator in the connected peers
+                return self.is_validator() && connected_peers.iter().any(|peer| {
+                    peer.network_id() == NetworkId::Validator
+                });
+                },
+            Err(_) => {
+                return self.is_validator();
+            }
+            }
+        }
+
+
     /// Returns true iff there's an active sync request from consensus
     fn active_sync_request(&self) -> bool {
         self.consensus_notification_handler.active_sync_request()
@@ -520,9 +542,9 @@ impl<
 
     /// Returns true iff consensus is currently executing
     fn check_if_consensus_executing(&self) -> bool {
-        self.is_validator() && self.bootstrapper.is_bootstrapped() && !self.active_sync_request()
+        self.is_in_validator_set() && self.bootstrapper.is_bootstrapped() && !self.active_sync_request()
     }
-
+    
     /// Checks if the connection deadline has passed. If so, validators with
     /// genesis waypoints will be automatically marked as bootstrapped. This
     /// helps in the case of single node deployments, where there are no peers
@@ -588,6 +610,7 @@ impl<
 
         // Drive progress depending on if we're bootstrapping or continuously syncing
         if self.bootstrapper.is_bootstrapped() {
+
             // Fetch any consensus sync requests
             let consensus_sync_request = self.consensus_notification_handler.get_sync_request();
 
@@ -610,6 +633,7 @@ impl<
                 metrics::increment_counter(&metrics::CONTINUOUS_SYNCER_ERRORS, error.get_label());
             }
         } else {
+    
             metrics::increment_counter(
                 &metrics::EXECUTING_COMPONENT,
                 ExecutingComponent::Bootstrapper.get_label(),

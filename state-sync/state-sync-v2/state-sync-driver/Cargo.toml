@@ -21,6 +21,7 @@ diem-data-client = { workspace = true }
 diem-data-streaming-service = { workspace = true }
 diem-event-notifications = { workspace = true }
 diem-executor-types = { workspace = true }
+diem-sdk = { workspace = true }
 diem-infallible = { workspace = true }
 diem-logger = { workspace = true }
 diem-mempool-notifications = { workspace = true }
@@ -39,6 +40,7 @@ serde = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 tokio-stream = { workspace = true }
+reqwest = { workspace = true }
 
 [dev-dependencies]
 anyhow = { workspace = true }
@@ -62,3 +64,4 @@ mockall = { workspace = true }
 move-core-types = { workspace = true }
 ntest = { workspace = true }
 rand = { workspace = true }
+
