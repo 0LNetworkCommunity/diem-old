@@ -6,10 +6,10 @@ use crate::{
     adapter_common::{
         discard_error_output, discard_error_vm_status, PreprocessedTransaction, VMAdapter,
     },
-    diem_vm_impl::{get_transaction_output, DiemVMImpl, DiemVMInternals},
-    block_executor::{DiemTransactionOutput, BlockDiemVM},
+    block_executor::{BlockDiemVM, DiemTransactionOutput},
     counters::*,
     data_cache::StorageAdapter,
+    diem_vm_impl::{get_transaction_output, DiemVMImpl, DiemVMInternals},
     errors::expect_only_successful_execution,
     move_vm_ext::{MoveResolverExt, RespawnedSession, SessionExt, SessionId},
     sharded_block_executor::ShardedBlockExecutor,
@@ -23,8 +23,7 @@ use diem_block_executor::txn_commit_hook::NoOpTransactionCommitHook;
 use diem_crypto::HashValue;
 use diem_framework::natives::code::PublishRequest;
 use diem_gas::{
-    DiemGasMeter, DiemGasParameters, ChangeSetConfigs, Gas, StandardGasMeter,
-    StorageGasParameters,
+    ChangeSetConfigs, DiemGasMeter, DiemGasParameters, Gas, StandardGasMeter, StorageGasParameters,
 };
 use diem_logger::{enabled, prelude::*, Level};
 use diem_state_view::StateView;
@@ -386,6 +385,7 @@ impl DiemVM {
             &function,
             struct_constructors,
         )?;
+        info!("executing entry function");
         Ok(session.execute_entry_function(
             script_fn.module(),
             script_fn.function(),
@@ -416,10 +416,13 @@ impl DiemVM {
 
         // Run the execution logic
         {
-            gas_meter.charge_intrinsic_gas_for_transaction(txn_data.transaction_size())?;
+            // commit note: moved to gas fee evaluation to match below
 
             match payload {
                 TransactionPayload::Script(script) => {
+                    // always tx payload first for scripts
+                    gas_meter.charge_intrinsic_gas_for_transaction(txn_data.transaction_size())?;
+
                     let loaded_func =
                         session.load_script(script.code(), script.ty_args().to_vec())?;
                     let args =
@@ -440,12 +443,65 @@ impl DiemVM {
                     )?;
                 },
                 TransactionPayload::EntryFunction(script_fn) => {
-                    self.validate_and_execute_entry_function(
-                        &mut session,
-                        gas_meter,
-                        txn_data.senders(),
-                        script_fn,
-                    )?;
+                    ///////// 0L ////////
+                    // For the special case of epoch boundaries which use a lot
+                    // of gas this function is intentionally able to be called
+                    // by any  end user
+                    // It is done this way in OL so that the VM never
+                    // is the signer of a transaction. FOR NO TRANSACTIONS IN
+                    // 0L.
+                    // The main benefit is that the chain cannot halt on
+                    // administrative processes that are done at the epoch
+                    // boundary.
+                    // In the event of the db being in an unexpected state, a
+                    // user-initiated epoch boundary will abort the transaction
+                    // with error. Were the VM to call this same transaction the
+                    // network would halt.
+                    // (Perhaps with sufficient formal verification the network
+                    // could get to the point of never having an error.)
+                    // However, the epoch boundary may use more
+                    // resources than the allowed limit for user
+                    // transactions.
+                    // So we make a special exception here.
+                    // Otherwise the user sending the epoch trigger
+                    // would see: EXECUTION_LIMIT_REACHED.
+
+                    // TODO: how much expense does this add?
+                    let is_gov = script_fn
+                        .module()
+                        .to_string()
+                        .contains("000000000000000000000000000000000000000000000000000000000000001::diem_governance");
+                    let is_trigger = script_fn.function().to_string().contains("trigger_epoch"); // NOTE: will also catch smoke_trigger_epoch. Used in smoke tests
+
+                    if is_gov && is_trigger {
+                        warn!("Epoch boundary called by user on 0x1::diem_governance::trigger_epoch. Will not evaluate gas!");
+
+                        let args = txn_data
+                            .senders() // only doing a single arg, the sender
+                            .into_iter()
+                            .map(|s| MoveValue::Signer(s).simple_serialize().unwrap())
+                            .collect();
+
+                        // run the function with the same privilege VM
+                        // would have: no metering of gas
+                        session.execute_function_bypass_visibility(
+                            &script_fn.module(),
+                            script_fn.function(),
+                            vec![],
+                            args,
+                            &mut UnmeteredGasMeter,
+                        )?;
+                    } else {
+                        gas_meter
+                            .charge_intrinsic_gas_for_transaction(txn_data.transaction_size())?;
+
+                        self.validate_and_execute_entry_function(
+                            &mut session,
+                            gas_meter,
+                            txn_data.senders(),
+                            script_fn,
+                        )?;
+                    }
                 },
 
                 // Not reachable as this function should only be invoked for entry or script
