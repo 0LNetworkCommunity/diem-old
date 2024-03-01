@@ -75,8 +75,11 @@ impl Compatibility {
         let mut struct_layout = true;
         let mut friend_linking = true;
 
+        let mut err_message = "compatibility: \n".to_owned();
+
         // module's name and address are unchanged
         if old_module.address != new_module.address || old_module.name != new_module.name {
+            err_message.push_str(&format!("\n- module name mismatch: {:?}", new_module.name));
             struct_and_pub_function_linking = false;
         }
 
@@ -87,7 +90,10 @@ impl Compatibility {
                 None => {
                     // Struct not present in new . Existing modules that depend on this struct will fail to link with the new version of the module.
                     // Also, struct layout cannot be guaranteed transitively, because after
-                    // removing the struct, it could be re-added later with a different layout.
+                    // removing the struct, it could be re-added later with a
+                    // different layout.
+                    err_message.push_str(&format!("\n- struct is no longer present: {:?}", &name));
+
                     struct_and_pub_function_linking = false;
                     struct_layout = false;
                     break;
@@ -100,6 +106,7 @@ impl Compatibility {
                     &new_struct.type_parameters,
                 )
             {
+                err_message.push_str(&format!("\n- struct abilities or types incompatible: {:?}", &old_struct));
                 struct_and_pub_function_linking = false;
             }
             if new_struct.fields != old_struct.fields {
@@ -109,6 +116,9 @@ impl Compatibility {
                 // choose that changing the name (but not position or type) of a field is
                 // compatible. The VM does not care about the name of a field
                 // (it's purely informational), but clients presumably do.
+
+                err_message.push_str(&format!("\n- new struct fields mismatch: {:?}",  &new_struct.fields));
+
                 struct_layout = false
             }
         }
@@ -132,8 +142,12 @@ impl Compatibility {
                 Some(new_func) => new_func,
                 None => {
                     if matches!(old_func.visibility, Visibility::Friend) {
+                        err_message.push_str(&format!("\n- missing friend function: {:?}", &name));
+
                         friend_linking = false;
                     } else {
+                        err_message.push_str(&format!("\n- missing exposed function: {:?}", &name));
+
                         struct_and_pub_function_linking = false;
                     }
                     continue;
@@ -171,8 +185,10 @@ impl Compatibility {
                 )
             {
                 if matches!(old_func.visibility, Visibility::Friend) {
+                    err_message.push_str(&format!("\n- function visibility: {:?}", &name));
                     friend_linking = false;
                 } else {
+                    err_message.push_str(&format!("\n- no exposed function: {:?}", &name));
                     struct_and_pub_function_linking = false;
                 }
             }
@@ -186,23 +202,28 @@ impl Compatibility {
         let old_friend_module_ids: BTreeSet<_> = old_module.friends.iter().cloned().collect();
         let new_friend_module_ids: BTreeSet<_> = new_module.friends.iter().cloned().collect();
         if !old_friend_module_ids.is_subset(&new_friend_module_ids) {
+            err_message.push_str(&format!("\n- missing friend linking: {:?}", &old_module.friends.iter()));
+
             friend_linking = false;
         }
 
         if self.check_struct_and_pub_function_linking && !struct_and_pub_function_linking {
+            dbg!(format!("module error: {:#?}, check_struct_and_pub_function_linking {:#?}", &old_module.name, &err_message));
             return Err(PartialVMError::new(
                 StatusCode::BACKWARD_INCOMPATIBLE_MODULE_UPDATE,
-            ));
+            ).with_message(err_message));
         }
         if self.check_struct_layout && !struct_layout {
+            dbg!(format!("module error: {:#?}, check_struct_layout {:#?}",&old_module.name,  &err_message));
             return Err(PartialVMError::new(
                 StatusCode::BACKWARD_INCOMPATIBLE_MODULE_UPDATE,
-            ));
+            ).with_message(err_message));
         }
         if self.check_friend_linking && !friend_linking {
+            dbg!(format!("module error: {:#?}, check_friend_linking {:#?}", &old_module, &err_message));
             return Err(PartialVMError::new(
                 StatusCode::BACKWARD_INCOMPATIBLE_MODULE_UPDATE,
-            ));
+            ).with_message(err_message));
         }
 
         Ok(())

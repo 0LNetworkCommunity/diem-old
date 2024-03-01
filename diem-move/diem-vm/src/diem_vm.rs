@@ -956,7 +956,7 @@ impl DiemVM {
             bundle,
             expected_modules,
             allowed_deps,
-            check_compat: _,
+            check_compat,
         }) = session.extract_publish_request()
         {
             // TODO: unfortunately we need to deserialize the entire bundle here to handle
@@ -977,6 +977,22 @@ impl DiemVM {
                 }
             }
 
+            //////// 0L ////////
+            // vendor code is not actually checking the upgrade preferences
+            // sometimes 0x1 needs to make an arbitrary code upgrade.
+            let compat_cfg = if check_compat {
+              Compatibility::new(
+                    true,
+                    true,
+                    !self
+                        .0
+                        .get_features()
+                        .is_enabled(FeatureFlag::TREAT_FRIEND_AS_PRIVATE),
+                )
+            } else {
+              Compatibility::no_check()
+            };
+             //////// end 0L ////////
             // Publish the bundle and execute initializers
             // publish_module_bundle doesn't actually load the published module into
             // the loader cache. It only puts the module data in the data cache.
@@ -984,14 +1000,7 @@ impl DiemVM {
                 bundle.into_inner(),
                 destination,
                 gas_meter,
-                Compatibility::new(
-                    true,
-                    true,
-                    !self
-                        .0
-                        .get_features()
-                        .is_enabled(FeatureFlag::TREAT_FRIEND_AS_PRIVATE),
-                ),
+                compat_cfg, //////// 0L ////////
             ));
 
             self.execute_module_initialization(
