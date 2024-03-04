@@ -1,5 +1,5 @@
 [package]
-name = "diem-crypto-derive"
+name = "diem-crypto-derive-example"
 version = "0.0.3"
 authors = ["Diem Association <opensource@diem.com>"]
 publish = false
