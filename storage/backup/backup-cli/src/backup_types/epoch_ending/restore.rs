@@ -232,11 +232,11 @@ impl PreheatedEpochEndingRestore {
                 .get(&first_li.ledger_info().version())
                 .is_none()
             {
-                li.next_epoch_state()
-                    .ok_or_else(|| {
-                        anyhow!("Previous epoch ending LedgerInfo doesn't end an epoch")
-                    })?
-                    .verify(first_li)?;
+                if let Err(err) = li.next_epoch_state().ok_or_else(|| {
+                    anyhow!("Previous epoch ending LedgerInfo doesn't end an epoch")
+                })?.verify(first_li) {
+                    warn!("Verification error, likely due to a rescue mission this epoch: {}", err);
+                }
             }
         }
 
