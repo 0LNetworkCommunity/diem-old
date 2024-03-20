@@ -160,10 +160,18 @@ impl DbReader for StateDb {
             .db_shard(state_key.get_shard_id())
             .iter::<StateValueSchema>(read_opts)?;
         iter.seek(&(state_key.clone(), version))?;
-        Ok(iter
-            .next()
-            .transpose()?
-            .and_then(|((_, version), value_opt)| value_opt.map(|value| (version, value))))
+        let result = iter
+        .next()
+        .transpose()?;
+
+        let result = result.and_then(|((key, version), value_opt)| {
+        if key == *state_key && version == version {
+            value_opt.map(|value| (version, value))
+        } else {
+         None
+        }
+        });
+        Ok(result)   
     }
 
     /// Returns the proof of the given state key and version.
