@@ -2,10 +2,12 @@
 // Parts of the project are originally copyright © Meta Platforms, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-#[cfg(feature = "testing")]
+//////// 0L ////////
+// expose out of "testing"
+// #[cfg(feature = "testing")]
 use diem_framework::natives::cryptography::algebra::AlgebraContext;
 use diem_gas::{AbstractValueSizeGasParameters, NativeGasParameters, LATEST_GAS_FEATURE_VERSION};
-#[cfg(feature = "testing")]
+// #[cfg(feature = "testing")]
 use diem_types::chain_id::ChainId;
 use diem_types::{
     account_config::CORE_CODE_ADDRESS,
@@ -13,7 +15,7 @@ use diem_types::{
 };
 use move_vm_runtime::native_functions::NativeFunctionTable;
 use std::sync::Arc;
-#[cfg(feature = "testing")]
+// #[cfg(feature = "testing")]
 use {
     diem_framework::natives::{
         aggregator_natives::NativeAggregatorContext, code::NativeCodeContext,
@@ -25,7 +27,7 @@ use {
     once_cell::sync::Lazy,
 };
 
-#[cfg(feature = "testing")]
+// #[cfg(feature = "testing")]
 static DUMMY_RESOLVER: Lazy<BlankStorage> = Lazy::new(|| BlankStorage);
 
 pub fn diem_natives(
@@ -83,12 +85,14 @@ pub fn assert_no_test_natives(err_msg: &str) {
     )
 }
 
-#[cfg(feature = "testing")]
+//////// 0L ////////
+// This may not need to be only a feature="testing"
+// #[cfg(feature = "testing")]
 pub fn configure_for_unit_test() {
     move_unit_test::extensions::set_extension_hook(Box::new(unit_test_extensions_hook))
 }
 
-#[cfg(feature = "testing")]
+// #[cfg(feature = "testing")]
 fn unit_test_extensions_hook(exts: &mut NativeContextExtensions) {
     exts.add(NativeCodeContext::default());
     exts.add(NativeTransactionContext::new(
