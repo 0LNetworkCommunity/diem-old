@@ -18,7 +18,7 @@ diem-block-executor = { workspace = true }
 diem-block-partitioner = { workspace = true }
 diem-crypto = { workspace = true }
 diem-executor-service = { workspace = true }
-diem-gas = { workspace = true, features = ["testing"] }
+diem-gas = { workspace = true }
 diem-language-e2e-tests = { workspace = true }
 diem-logger = { workspace = true }
 diem-metrics-core = { workspace = true }
@@ -36,3 +36,7 @@ rayon = { workspace = true }
 [[bench]]
 name = "transaction_benches"
 harness = false
+
+[features]
+
+testing = ["diem-gas/testing"]

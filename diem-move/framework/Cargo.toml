@@ -77,7 +77,7 @@ tiny-keccak = { workspace = true }
 [dev-dependencies]
 diem-gas = { workspace = true }
 diem-language-e2e-tests = { workspace = true }
-diem-vm = { workspace = true, features = ["testing"] }
+diem-vm = { workspace = true}
 claims = { workspace = true }
 move-cli = { workspace = true }
 move-prover = { workspace = true }
@@ -86,7 +86,7 @@ move-unit-test = { workspace = true }
 [features]
 default = []
 fuzzing = ["diem-types/fuzzing", "proptest", "proptest-derive"]
-testing = ["diem-move-stdlib/testing"]
+testing = ["diem-move-stdlib/testing", "diem-vm/testing"]
 
 [lib]
 doctest = false

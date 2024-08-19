@@ -29,10 +29,10 @@ move-core-types = { path = "../../move-core/types" }
 move-ir-types = { path = "../../move-ir/types" }
 move-model = { path = "../../move-model" }
 move-resource-viewer = { path = "../move-resource-viewer" }
-move-stdlib = { path = "../../move-stdlib", features = ["testing"] }
+move-stdlib = { path = "../../move-stdlib" }
 move-symbol-pool = { path = "../../move-symbol-pool" }
 move-table-extension = { path = "../../extensions/move-table-extension" }
-move-vm-runtime = { path = "../../move-vm/runtime", features = ["testing"] }
+move-vm-runtime = { path = "../../move-vm/runtime" }
 move-vm-test-utils = { path = "../../move-vm/test-utils" }
 move-vm-types = { path = "../../move-vm/types" }
 
@@ -60,3 +60,4 @@ table-extension = [
  "move-vm-test-utils/table-extension"
 ]
 debugging = ["move-vm-runtime/debugging"]
+testing = ["move-stdlib/testing"]

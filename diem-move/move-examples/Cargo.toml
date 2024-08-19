@@ -15,7 +15,7 @@ rust-version = { workspace = true }
 [dependencies]
 diem-gas = { workspace = true }
 diem-types = { workspace = true }
-diem-vm ={ workspace = true, features = ["testing"] }
+diem-vm ={ workspace = true }
 clap = { workspace = true }
 move-cli = { workspace = true }
 move-package = { workspace = true }
@@ -25,3 +25,6 @@ move-vm-runtime = { workspace = true }
 
 [dev-dependencies]
 tempfile = { workspace = true }
+
+[features]
+testing = ["diem-vm/testing"]

@@ -24,7 +24,7 @@ diem-debugger = { workspace = true }
 diem-faucet-core = { workspace = true }
 diem-forge = { workspace = true }
 diem-framework = { workspace = true }
-diem-gas = { workspace = true, features = ["testing"] }
+diem-gas = { workspace = true }
 diem-global-constants = { workspace = true }
 diem-indexer = { workspace = true }
 diem-keygen = { workspace = true }
@@ -74,3 +74,6 @@ num_cpus = { workspace = true }
 # rand = { workspace = true }
 regex = { workspace = true }
 serde_yaml = { workspace = true }
+
+[features]
+testing = ["diem-gas/testing"]
