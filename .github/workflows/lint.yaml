@@ -16,7 +16,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
-        components: clippy, rustfmt
+        with:
+          components: clippy, rustfmt
       - name: Run cargo fmt
         run:  cargo fmt --all -- --check
       - name: Run cargo clippy
