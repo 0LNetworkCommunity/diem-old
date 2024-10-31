@@ -1,0 +1,22 @@
+name: Run Lint Checks
+
+on:
+  push:
+    branches:
+      - main
+      - ci-test
+      - add-basic-ci
+
+jobs:
+  lint-checks:
+    runs-on: ubuntu-latest
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Run checks on project
+      uses: dtolnay/rust-toolchain@stable
+      components: clippy, rustfmt
+    - name: Run cargo fmt
+      run:  cargo fmt --all -- --check
+    - name: Run cargo clippy
+      run:  cargo clippy --workspace --tests -- -D warnings
