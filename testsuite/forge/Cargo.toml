@@ -44,12 +44,10 @@ hyper = { workspace = true }
 hyper-tls = { workspace = true }
 itertools = { workspace = true }
 json-patch = { workspace = true }
-k8s-openapi = { version = "0.13.1", default-features = false, features = [
-    "v1_22",
-] }
-# WARNING: this library (kube) publishes only minor version updates with zero as major version
+# WARNING: these kube libraries publish only minor version updates with zero as major version
 # and therefore needs to be manually updated periodically here otherwise it ends up
 # transitively referencing a bunch of old libraries that then conflict with who knows what elsewhere.
+k8s-openapi = { version = "0.23.0", default-features = false, features = ["latest"] }
 kube = { version = "0.96.0", default-features = false, features = [
     "jsonpatch",
     "client",
