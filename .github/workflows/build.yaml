@@ -24,6 +24,7 @@ jobs:
         with:
           toolchain: stable
       - name: Print installed Rust toolchains
+        run: rustup toolchain list
       - name: Install required non-Rust build tools
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
