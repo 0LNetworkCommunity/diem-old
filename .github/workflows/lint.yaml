@@ -34,6 +34,6 @@ jobs:
           components: clippy
       - name: Run cargo fmt
         # Note the hacky +nightly below
-        run:  cargo _nightly fmt --all -- --check
+        run:  cargo +nightly fmt --all -- --check
       - name: Run cargo clippy
         run:  cargo clippy --workspace --tests -- -D warnings
