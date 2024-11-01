@@ -3,7 +3,7 @@ name: Check code builds
 on:
   push:
     branches:
-      - main
+      - release
       - ci-test
   pull_request:
     types: [opened, reopened]
