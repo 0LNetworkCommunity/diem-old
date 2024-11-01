@@ -24,6 +24,12 @@ jobs:
         with:
           toolchain: stable
       - name: Print installed Rust toolchains
+      - name: Install required non-Rust build tools
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          # TODO: check if we need all the packages below -- this list comes from the Libra build setup script
+          packages: build-essential lld pkg-config libssl-dev libgmp-dev clang
+          version: 1.0 # This is a cache key -- change it when you change the package list above
         run: rustup toolchain list
       - name: Run cargo build
         run:  cargo build
