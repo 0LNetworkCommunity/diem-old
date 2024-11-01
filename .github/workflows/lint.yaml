@@ -42,7 +42,7 @@ jobs:
         # Note the hacky +nightly below
         run:  cargo +nightly fmt --all -- --check
       - name: Run cargo fmt
-        if: False == env.ENABLE_RUSTFMT == 'True'
+        if: env.ENABLE_RUSTFMT != 'True'
         run:  echo "cargo fmt skipped due to project code not complying with current format rules"
       - name: Run cargo clippy
         run:  cargo clippy --workspace --tests -- -D warnings
