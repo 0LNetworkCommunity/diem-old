@@ -1,4 +1,4 @@
-name: Run Lint Checks
+name: Code Checks
 
 on:
   push:
@@ -9,16 +9,31 @@ on:
 
 jobs:
   lint-checks:
-    name: Run code checks
+    name: Rust code checks
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
+      # Why are we installing two Rust toolchain versions below?
+      # answer: the rustfmt project is disfunctional, and chooses
+      # to make many of its useful features only available if you run
+      # a nightly toolchain (even though those features themselves are
+      # many years old now). The recommended workaround is to install
+      # both the toolchain version you want to use, and also the nightly
+      # toolchain, just to be able to run "cargo +nightly fmt" to get the
+      # full, very old set of rustfmt functionality.
+      - name: Install Nightly Rust Toolchain
+        uses: dtolnay/rust-toolchain@master
         with:
-          components: clippy, rustfmt
+          toolchain: nightly
+          components: rustfmt
+      - name: Install Stable Rust Toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          components: clippy
       - name: Run cargo fmt
-        run:  cargo fmt --all -- --check
+        # Note the hacky +nightly below
+        run:  cargo _nightly fmt --all -- --check
       - name: Run cargo clippy
         run:  cargo clippy --workspace --tests -- -D warnings
