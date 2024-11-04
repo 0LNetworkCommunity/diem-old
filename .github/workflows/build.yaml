@@ -17,9 +17,9 @@ jobs:
     steps:
     - name: Free disk space
       uses: jlumbroso/free-disk-space@main
-        with:
-          large-packages: false
-          tool-cache: false
+      with:
+        large-packages: false
+        tool-cache: false
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Rust Toolchain
