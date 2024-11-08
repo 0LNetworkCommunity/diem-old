@@ -15,11 +15,14 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
+      - name: Maximize build disk space
+        uses: AdityaGarg8/remove-unwanted-software@v4.1
         with:
-          large-packages: false
-          tool-cache: false
+          remove-android: 'true'
+          remove-docker-images: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-dotnet: 'true'
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Rust Toolchain
