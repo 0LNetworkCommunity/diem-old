@@ -23,8 +23,8 @@ use move_vm_types::{
     values::{Reference, Struct, Value},
 };
 use smallvec::{smallvec, SmallVec};
-use std::{collections::VecDeque, sync::Arc};
-
+use std::{collections::VecDeque, env, sync::Arc};
+use once_cell::sync::Lazy;
 // instead of compile time feature, we use environment variable to enable debug prints from the Move vm
 // Note: downstream libra does not use compile time features.
 const MOVE_DEBUG_ENV: Lazy<bool> = Lazy::new(|| match env::var("MOVE_DEBUG") {
