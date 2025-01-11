@@ -27,7 +27,7 @@ use std::{collections::VecDeque, env, sync::Arc};
 use once_cell::sync::Lazy;
 // instead of compile time feature, we use environment variable to enable debug prints from the Move vm
 // Note: downstream libra does not use compile time features.
-const MOVE_DEBUG_ENV: Lazy<bool> = Lazy::new(|| match env::var("MOVE_DEBUG") {
+const MOVE_DEBUG_ENV: Lazy<bool> = Lazy::new(|| match env::var("DIEM_MOVE_DEBUG") {
     Ok(_) => true,
     Err(_) => false,
 });
