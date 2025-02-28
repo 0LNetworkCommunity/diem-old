@@ -1,6 +1,8 @@
 name: Check code builds
 
 on:
+  schedule:
+  - cron: "30 00 * * *"
   push:
     branches:
       - release
